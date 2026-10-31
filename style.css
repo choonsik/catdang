@@ -1,0 +1,673 @@
+:root {
+  --primary: #10b981;
+  --bg-sky: #e0f2fe;
+  --ink: #0f172a;
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  --font-family: 'Gowun Dodum', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-sky);
+  color: var(--ink);
+  font-family: var(--font-family);
+  user-select: none;
+}
+
+#canvas-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ─── 입장 오버레이 ─── */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.intro-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 2.2rem 2rem;
+  text-align: center;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+}
+
+.intro-badge {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 0.8rem;
+}
+
+.intro-title {
+  font-family: 'Gowun Batang', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: #0f172a;
+}
+
+.intro-desc {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #475569;
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 1.2rem;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 0.4rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.95rem;
+  font-family: var(--font-family);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #10b981;
+}
+
+.breed-selector {
+  margin-bottom: 1.6rem;
+}
+
+.selector-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.breed-pills {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.breed-btn {
+  flex: 1;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  color: #334155;
+  padding: 0.5rem 0.2rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.breed-btn.active {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  font-weight: bold;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.9rem;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+}
+
+.btn-primary:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+}
+
+.intro-foot {
+  margin-top: 1.2rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* ─── 상단 HUD ─── */
+.hud-top {
+  position: fixed;
+  top: 1.2rem;
+  left: 1.2rem;
+  right: 1.2rem;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.hud-top > * {
+  pointer-events: auto;
+}
+
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid var(--glass-border);
+  padding: 0.5rem 1rem;
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.brand-title {
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.brand-status {
+  font-size: 0.82rem;
+  color: #15803d;
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.hud-top-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.glass-btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid var(--glass-border);
+  color: #334155;
+  padding: 0.5rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-family: var(--font-family);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+
+.glass-btn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ─── 하단 HUD (채팅 + 액션 바) ─── */
+.hud-bottom {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  pointer-events: none;
+  width: 90%;
+  max-width: 500px;
+}
+
+.hud-bottom > * {
+  pointer-events: auto;
+}
+
+/* 채팅 바 */
+.chat-bar {
+  width: 100%;
+  display: flex;
+  gap: 0.4rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid var(--glass-border);
+  border-radius: 30px;
+  padding: 0.35rem 0.5rem;
+  box-shadow: var(--shadow);
+}
+
+.chat-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  font-family: var(--font-family);
+  color: #0f172a;
+}
+
+.chat-send-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-weight: bold;
+  font-size: 0.85rem;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-send-btn:hover {
+  background: #059669;
+}
+
+/* 액션 바 */
+.action-bar {
+  display: flex;
+  gap: 0.4rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1.5px solid var(--glass-border);
+  padding: 0.45rem 0.6rem;
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  color: #334155;
+  padding: 0.45rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-family: var(--font-family);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.action-btn.active {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.jump-btn {
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 700;
+}
+.jump-btn:hover {
+  background: #bbf7d0;
+  transform: translateY(-2px);
+}
+.jump-btn:active {
+  transform: translateY(1px) scale(0.96);
+}
+
+.cart-btn {
+  background: #ffedd5;
+  color: #c2410c;
+  font-weight: 700;
+  border: 1.5px solid #fdba74;
+}
+.cart-btn:hover {
+  background: #fed7aa;
+  transform: translateY(-2px);
+}
+.cart-btn.active {
+  background: #ea580c;
+  color: #ffffff;
+}
+.cart-btn.hidden {
+  display: none !important;
+}
+
+.meow-btn {
+  background: #fef08a;
+  color: #854d0e;
+}
+.meow-btn:hover {
+  background: #fde047;
+}
+
+.hud-hint {
+  font-size: 0.75rem;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+/* ─── 모바일 가상 조이스틱 ─── */
+.touch-controls {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .touch-controls {
+    display: block;
+    position: fixed;
+    bottom: 8.5rem;
+    left: 1.5rem;
+    z-index: 18;
+    pointer-events: auto;
+  }
+
+  .virtual-stick {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1.5px solid var(--glass-border);
+    position: relative;
+    touch-action: none;
+  }
+
+  .stick-knob {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #10b981;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ─── 공간 전환 페이드 베일 ─── */
+.world-fade-veil {
+  position: fixed;
+  inset: 0;
+  background: #090d16;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 60;
+  transition: opacity 0.32s ease-in-out;
+}
+
+.world-fade-veil.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─── 공간 이동 상단 버튼 ─── */
+.world-select-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.05rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  border-radius: 22px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.world-select-btn:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+  border-color: #10b981;
+}
+
+.dropdown-caret {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-left: 2px;
+}
+
+/* ─── 7대 공간 테마 선택 모달 ─── */
+.world-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.world-modal.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.world-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.world-modal-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 780px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 1.8rem 1.8rem 1.6rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+}
+
+.world-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.4rem;
+}
+
+.world-modal-badge {
+  display: inline-block;
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-bottom: 0.4rem;
+}
+
+.world-modal-title {
+  font-family: 'Gowun Batang', serif;
+  font-size: 1.45rem;
+  color: #0f172a;
+}
+
+.world-modal-desc {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin-bottom: 1.2rem;
+}
+
+.btn-close-modal {
+  background: #f1f5f9;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1rem;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* 그리드 & 카드 */
+.world-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.9rem;
+}
+
+.world-card {
+  position: relative;
+  background: #f8fafc;
+  border: 1.8px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.1rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.world-card:hover {
+  background: #ffffff;
+  border-color: #10b981;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.18);
+}
+
+.world-card.active {
+  background: #ecfdf5;
+  border-color: #10b981;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.22);
+}
+
+.world-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.world-card-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.world-card-tag {
+  font-size: 0.72rem;
+  color: #475569;
+  background: #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.world-card.active .world-card-tag {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.world-card-name {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.world-card-desc {
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.35;
+  min-height: 2.1rem;
+}
+
+.world-card-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: auto;
+}
+
+@media (max-width: 640px) {
+  .world-modal-card {
+    padding: 1.3rem 1.1rem;
+    border-radius: 22px;
+  }
+  .world-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+  .hud-brand .brand-title {
+    display: none;
+  }
+}

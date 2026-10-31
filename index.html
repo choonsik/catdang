@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>캣당 (CatDang) · 고양이 평화 공원 메타버스</title>
+    <meta name="description" content="고양이가 되어 동화 같은 아이소메트릭 공원에서 다른 냥이들과 함께 산책하고 쉬어가는 힐링 메타버스" />
+
+    <!-- 파비콘 (귀여운 발바닥 아이콘) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐾</text></svg>" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="캣당 (CatDang)" />
+    <meta property="og:title" content="캣당 (CatDang) · 고양이 평화 공원" />
+    <meta property="og:description" content="동화 같은 2.5D 공원에서 나만의 고양이로 다른 집사들과 실시간으로 산책하세요." />
+    <meta name="theme-color" content="#82be42" />
+
+    <!-- 웹폰트: 고운돋움 & Gowun Batang -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gowun+Batang:wght@700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- 3D 캔버스 -->
+    <div id="canvas-container"></div>
+
+    <!-- 1. 입장 모달 (닉네임 & 품종 선택) -->
+    <div id="intro-overlay" class="intro-overlay">
+      <div class="intro-card">
+        <div class="intro-badge">🐾 온라인 고양이 평화 공원</div>
+        <h1 class="intro-title">캣당 (CatDang)</h1>
+        <p class="intro-desc">
+          화사한 동화 속 공원에 어서 오세요!<br />
+          귀여운 고양이가 되어 다른 냥이들과 함께 산책하고<br />
+          벤치에서 식빵을 구우며 이야기를 나눠보세요.
+        </p>
+
+        <!-- 닉네임 입력 -->
+        <div class="input-group">
+          <label for="nickname-input">공원에서 부를 닉네임</label>
+          <input type="text" id="nickname-input" maxlength="8" placeholder="예: 치즈집사, 보리" value="초보냥" />
+        </div>
+
+        <!-- 품종 선택 -->
+        <div class="breed-selector">
+          <span class="selector-label">고양이 선택</span>
+          <div class="breed-pills">
+            <button class="breed-btn active" data-breed="cheese">치즈냥</button>
+            <button class="breed-btn" data-breed="calico">삼색이</button>
+            <button class="breed-btn" data-breed="tuxedo">턱시도</button>
+            <button class="breed-btn" data-breed="black">깜냥이</button>
+          </div>
+        </div>
+
+        <div class="intro-actions">
+          <button id="btn-enter" class="btn-primary">🐾 공원으로 입장하기</button>
+        </div>
+
+        <div class="intro-foot">
+          <span>100% 무료 · 실시간 P2P 멀티플레이어 · 서버비 0원</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 상단 헤더 HUD -->
+    <header class="hud-top">
+      <div class="hud-brand">
+        <span class="brand-title">🐱 캣당</span>
+        <span class="brand-status" id="online-counter">🐾 고양이 4마리 노는 중</span>
+      </div>
+
+      <div class="hud-top-center">
+        <button id="btn-world-select" class="glass-btn world-select-btn" title="공간 이동">
+          <span id="current-world-icon">🌳</span>
+          <span id="current-world-name">평화 공원</span>
+          <span class="dropdown-caret">▾</span>
+        </button>
+      </div>
+
+      <div class="hud-top-right">
+        <button id="btn-sound-toggle" class="glass-btn icon-btn" title="소리 켜기/끄기">
+          🔇 <span class="btn-label" id="sound-label">소리 켜기</span>
+        </button>
+        <button id="btn-focus-cat" class="glass-btn" title="내 고양이에게 카메라 맞추기">
+          📍 내 위치
+        </button>
+      </div>
+    </header>
+
+    <!-- 3. 하단 인터랙션 & 채팅 바 -->
+    <footer class="hud-bottom">
+      <!-- 실시간 채팅 입력창 -->
+      <div class="chat-bar">
+        <input type="text" id="chat-input" maxlength="20" placeholder="말풍선 남기기 (엔터)..." autocomplete="off" />
+        <button id="btn-send-chat" class="chat-send-btn">전송</button>
+      </div>
+
+      <!-- 액션 독 -->
+      <div class="action-bar">
+        <button id="btn-action-jump" class="action-btn jump-btn" title="폴짝 점프 (Spacebar)">
+          🐾 <span class="action-name">폴짝!</span>
+        </button>
+        <button id="btn-action-meow" class="action-btn meow-btn" title="야옹 울기 (E)">
+          🐱 <span class="action-name">야옹!</span>
+        </button>
+        <button id="btn-action-loaf" class="action-btn" title="식빵 굽기 (골골송)">
+          🍞 <span class="action-name">식빵 굽기</span>
+        </button>
+        <button id="btn-action-stretch" class="action-btn" title="기지개">
+          🧘 <span class="action-name">기지개</span>
+        </button>
+        <button id="btn-action-zen" class="action-btn" title="멍때리기 시점">
+          🌿 <span class="action-name" id="zen-btn-text">멍때리기</span>
+        </button>
+      </div>
+
+      <div class="hud-hint">
+        WASD 이동 · <strong>스페이스바: 폴짝 점프!</strong> · E: 야옹 · 화면 드래그 둘러보기
+      </div>
+    </footer>
+
+    <!-- 모바일 가상 조이스틱 -->
+    <div id="touch-controls" class="touch-controls">
+      <div id="virtual-stick" class="virtual-stick">
+        <div id="stick-knob" class="stick-knob"></div>
+      </div>
+    </div>
+
+    <!-- 공간 전환 암전 페이드 베일 -->
+    <div id="world-fade-veil" class="world-fade-veil"></div>
+
+    <!-- 7대 테마 공간 선택 모달 -->
+    <div id="world-modal" class="world-modal hidden">
+      <div class="world-modal-backdrop" id="world-modal-backdrop"></div>
+      <div class="world-modal-card">
+        <div class="world-modal-header">
+          <div class="world-modal-title-group">
+            <span class="world-modal-badge">🐾 7대 테마 공간</span>
+            <h2 class="world-modal-title">어디로 마실 갈까요?</h2>
+          </div>
+          <button id="btn-close-world-modal" class="btn-close-modal" aria-label="닫기">✕</button>
+        </div>
+        <p class="world-modal-desc">가고 싶은 공간을 탭하면 모든 고양이 친구들과 함께 순간이동합니다.</p>
+        <div class="world-grid" id="world-grid">
+          <!-- JS에서 동적 주입 -->
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
